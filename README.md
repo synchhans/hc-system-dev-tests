@@ -1,59 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HC System — Form Login
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi Laravel 12 dengan autentikasi menggunakan Username (bukan email). Proyek ini dibuat untuk memenuhi Soal Praktik Human Capital System Development: Pembuatan Form Login.
 
-## About Laravel
+## Ringkasan Soal Praktik
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Tampilan Login: 2 input (ID/Username, Password) + tombol Login, desain sederhana (Bootstrap).
+- Proses Login: verifikasi ke database; sukses → pindah ke halaman utama dan tampilkan pesan “Selamat datang, [nama pengguna]!”; gagal → tampilkan notifikasi “Login gagal! ID atau Password salah.” dan tetap di login.
+- Syarat Tambahan: metode POST, validasi tidak boleh kosong, session untuk status login, halaman logout untuk mengakhiri session.
+- Nilai Tambahan: password hashing, pesan flash (alert/toast).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Implementasi di Proyek Ini
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Login Form: `resources/views/auth/login.blade.php` (Bootstrap, validasi frontend sederhana, tombol disabled hingga valid).
+- Autentikasi: `app/Http/Requests/Auth/LoginRequest.php` (validasi + rate limit, `Auth::attempt` via username) dan `app/Http/Controllers/Auth/AuthenticatedSessionController.php` (POST `/login`, redirect ke `home`).
+- Pesan: error kredensial pada key `credentials` ditampilkan sebagai toast; success message disupport.
+- Home: `resources/views/home.blade.php` menampilkan “Selamat datang, {{ $user->name }}!”.
+- Session & Logout: session Laravel, POST `/logout` mengakhiri sesi dan kembali ke halaman login.
+- Keamanan: password disimpan hashed (`App\Models\User` cast `password` => `hashed`).
 
-## Learning Laravel
+## Prasyarat
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.2+
+- Composer 2.x
+- Node.js 18+ (disarankan 20+) dan npm
+- Database: MySQL 8+ atau SQLite (opsional)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi & Setup
 
-## Laravel Sponsors
+1) Salin env dan generate app key
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+2) Konfigurasi database
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- Opsi MySQL (disarankan untuk pengujian penuh):
 
-## Contributing
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hc_system
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Pastikan database `hc_system` sudah dibuat.
 
-## Code of Conduct
+- Opsi SQLite (quick start):
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+DB_CONNECTION=sqlite
+```
 
-## Security Vulnerabilities
+```bash
+mkdir -p database
+type nul > database/database.sqlite   # Windows
+# touch database/database.sqlite       # macOS/Linux
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3) Install dependencies, migrasi, dan seeder
 
-## License
+```bash
+composer install
+php artisan migrate --seed
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+npm install
+npm run dev   # jalankan Vite untuk assets
+```
+
+4) Jalankan aplikasi
+
+```bash
+php artisan serve   # http://127.0.0.1:8000
+```
+
+Alternatif all-in-one (server + queue + logs + Vite) gunakan:
+
+```bash
+composer run dev
+```
+
+## Akun Uji (Seeder)
+
+- Admin → username: `admin`, password: `12345`
+- User  → username: `user`,  password: `12345`
+
+Login di `/login` menggunakan Username.
+
+## URL Penting
+
+- `/login` → halaman login
+- `/home` → halaman utama setelah login
+- `/admin` → dashboard admin (hanya role admin)
+
+## Catatan Tambahan
+
+- Queue default: `database`. Saat menjalankan `composer run dev`, queue listener ikut aktif.
+- Sesuaikan variabel `.env` seperti `APP_URL`, `MAIL_*`, Redis jika diperlukan.
+- Skrip yang tersedia: `composer run setup`, `composer run dev`, `npm run dev`, `npm run build`.
