@@ -17,18 +17,16 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name'              => fake()->name(),
+            'username'          => fake()->unique()->userName(),
+            'email'             => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'role' => User::ROLE_USER, // default user biasa
-            'password' => 'password', // akan otomatis di-hash oleh cast
-            'remember_token' => Str::random(10),
+            'role'              => User::ROLE_USER,
+            'password'          => 'password',
+            'remember_token'    => Str::random(10),
         ];
     }
 
-    /**
-     * State user sebagai admin.
-     */
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [

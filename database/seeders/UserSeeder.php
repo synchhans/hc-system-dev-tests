@@ -15,15 +15,17 @@ class UserSeeder extends Seeder
         User::factory()
             ->admin()
             ->create([
-                'name' => 'Administrator',
-                'email' => 'admin@hc.test',
+                'name'     => 'Administrator',
+                'username' => 'admin',        
+                'email'    => 'admin@hc.test',
                 'password' => '12345',
             ]);
 
         User::factory()
             ->create([
-                'name' => 'User Biasa',
-                'email' => 'user@hc.test',
+                'name'     => 'User Biasa',
+                'username' => 'user',
+                'email'    => 'user@hc.test',
                 'password' => '12345',
             ]);
 
