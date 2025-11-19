@@ -57,13 +57,13 @@
                             Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         @if (Route::has('profile.edit'))
                             <a class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
                                 Profil
                             </a>
                         @endif
-                    </li>
+                    </li> --}}
                     @if(auth()->user()?->isAdmin())
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
